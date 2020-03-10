@@ -16,22 +16,34 @@
 }
 ```
 
-## getVideoUrl 视频的全部清晰度下载地址及视频ID
-传入视频播放地址，可解析出视频全部清晰度及视频ID（ID用于获取相似推荐），<br>
-返回值为列表，列表第一项为包含全部清晰度的字典，第二项为视频ID<br>
-例如：<br>
+## ~~getVideoUrl 视频的全部清晰度下载地址及视频ID~~
+该函数已弃用<br>
+
+## getVideoInfo 视频的基本信息及全部清晰度下载地址
+传入视频播放地址，可解析出视频的基本信息及全部清晰度下载地址（ID用于获取相似推荐），<br>
+返回值为 PornHubVideo 类对象，可使用 print 函数打印其内容<br>
+打印内容格式如下：<br>
 ```
-[
-	[{
-			'defaultQuality': True,             #是否默认播放
-			'format': 'mp4',                    #视频格式
-			'quality': '720',                   #视频清晰度
-			'videoUrl': 'https://xxxxxxx'       #视频地址（可直接用于下载）
-	 },
-	 ...
-	 ],
-	187765541                                   #视频ID
-]
+{
+    "pageUrl": "https://www.pornhub.com/view_video.php?viewkey=***************",
+    "viewkey": "***************",
+    "title": "********",
+    "imgUrl": "",
+    "duration": "00:00:00",
+    "definitions": [
+        {
+            "format": "mp4",
+            "quality": "720",
+            "videoUrl": ""
+        },
+        {
+            "format": "hls",
+            "quality": "720",
+            "videoUrl": ""
+        },
+        ...
+    ]
+}
 ```
 ## getVideoSimilar 视频的全部相关推荐
 传入视频ID,获取该视频ID的全部相似推荐（共60个），返回格式与getVideoList相同<br>
