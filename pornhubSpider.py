@@ -90,7 +90,7 @@ class PornhubVideo(object):
         self.__definitions.remove(self.definitions[-1])
     
     # 获取相关视频
-    def GetSimilar(self, page=1, ifGetInfo=False):
+    def GetRelated(self, page=1, ifGetInfo=False):
         result = []
         if self.__videoID == '':
             return result
