@@ -68,9 +68,13 @@ class PornhubVideo(object):
         rep = requests.get(url)
         doc = soup(rep.content, 'lxml')
         script = doc.find(id='player').script.contents[0]
-        script = re.sub('loadScriptUniqueId[\s\S]+', '', script)
+        script = re.sub('playerObjList[\s\S]+', '', script)
         search = re.search('flashvars_([0-9]+)', script)
         script += search.group(0) + ';'
+        #print(script)
+        file = open('test.txt','w',encoding='utf-8')
+        file.write(script)
+        file.close()
         self.__videoID = search.group(1)
         json_str = str(js2py.eval_js(script))
         flashvars = ast.literal_eval(json_str)
@@ -82,12 +86,15 @@ class PornhubVideo(object):
         h, m = divmod(m, 60)
         self.__duration = '%02d:%02d:%02d' % (h, m, s)
         for defin in flashvars['mediaDefinitions']:
+            videoUrl = defin['videoUrl']
+            quality = defin['quality']
+            if videoUrl == '' or not isinstance(quality, str):
+                continue
             info = {}
             info['format'] = defin['format']
-            info['quality'] = defin['quality']
-            info['videoUrl'] = defin['videoUrl']
+            info['quality'] =quality
+            info['videoUrl'] = videoUrl
             self.definitions.append(info)
-        self.__definitions.remove(self.definitions[-1])
     
     # 获取相关视频
     def GetRelated(self, page=1, ifGetInfo=False):
