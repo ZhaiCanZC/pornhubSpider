@@ -24,4 +24,4 @@
 | title: str | 视频标题 |
 | imgUrl: str | 视频封面图片链接地址 |
 | duration: str | 视频时长，格式为 hh:mm:ss |
-| definitions: list | 视频所有格式、分辨率及链接 |
+| definitions: dict | 视频所有格式、分辨率及链接 |
