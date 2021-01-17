@@ -1,2 +1,5 @@
 test*
-vlc/
+/dist/
+/build/
+*egg-info/
+*.bat

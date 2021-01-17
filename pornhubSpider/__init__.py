@@ -1,9 +1,10 @@
-import requests
+import ast
 import json
 import re
-import js2py
-import ast
 import threading
+
+import js2py
+import requests
 from bs4 import BeautifulSoup as soup
 
 
@@ -109,7 +110,7 @@ class PornhubVideo(object):
         rep = requests.get(url)
         doc = soup(rep.content, 'lxml')
 
-        file = open('test.html', 'wb')
+        file = open('../../RandomPorn/test.html', 'wb')
         file.write(doc.prettify(encoding='utf-8'))
         file.close()
 
@@ -137,7 +138,7 @@ class PornhubVideo(object):
             return
         script += search.group(0) + ';'
         # print(script)
-        file = open('test.txt', 'w', encoding='utf-8')
+        file = open('../../RandomPorn/test.txt', 'w', encoding='utf-8')
         file.write(script)
         file.close()
         self.__videoID = search.group(1)
