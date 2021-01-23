@@ -1,5 +1,6 @@
 import ast
 import json
+import os
 import re
 import threading
 
@@ -86,7 +87,6 @@ class PornhubVideo(object):
                 del porn
         return porn
 
-
     class GetInfoThread(threading.Thread):
         def __init__(self, phvideo):
             threading.Thread.__init__(self)
@@ -110,10 +110,6 @@ class PornhubVideo(object):
         rep = requests.get(url)
         doc = soup(rep.content, 'lxml')
 
-        file = open('../../RandomPorn/test.html', 'wb')
-        file.write(doc.prettify(encoding='utf-8'))
-        file.close()
-
         try:
             wrapper = doc.find('div', {'class': re.compile(r'video-wrapper(.+)?')})
             title = wrapper.find('h1', {'class': 'title'})
@@ -130,38 +126,50 @@ class PornhubVideo(object):
             self.__isPremium = False
         try:
             script = doc.find(id='player').script.contents[0]
-            script = re.sub('playerObjList[\s\S]+', '', script)
-            search = re.search('flashvars_([0-9]+)', script)
+            script = re.sub(r'playerObjList[\s\S]+', '', script)
+            flashvars_search = re.search(r'flashvars_([0-9]+)', script)
+
         except:
             self.__success = False
             print('加载失败')
             return
-        script += search.group(0) + ';'
-        # print(script)
-        file = open('../../RandomPorn/test.txt', 'w', encoding='utf-8')
-        file.write(script)
-        file.close()
-        self.__videoID = search.group(1)
-        json_str = str(js2py.eval_js(script))
-        flashvars = ast.literal_eval(json_str)
-        self.__pageUrl = flashvars['link_url']
+        with open('scripts.py', 'w', encoding='utf-8') as file:
+            file.write(js2py.translate_js(script))
+        self.__videoID = flashvars_search.group(1)
+        try:
+            import scripts
+        except:
+            self.__success = False
+            print('加载失败')
+            return
+        flashvars = scripts.var.get(flashvars_search.group(0))
+        self.__pageUrl = flashvars['link_url'].to_py()
         self.__viewkey = re.search(r'\?viewkey=(.+)', self.__pageUrl).group(1)
-        self.__title = flashvars['video_title']
-        self.__imgUrl = flashvars['image_url']
-        time = int(flashvars['video_duration'])
+        self.__title = flashvars['video_title'].to_py()
+        self.__imgUrl = flashvars['image_url'].to_py()
+        time = int(flashvars['video_duration'].to_py())
         m, s = divmod(time, 60)
         h, m = divmod(m, 60)
         self.__duration = '%02d:%02d:%02d' % (h, m, s)
-        for defin in flashvars['mediaDefinitions']:
-            videoUrl = defin['videoUrl']
-            quality = defin['quality']
-            vformat = defin['format']
+        for defin in flashvars['mediaDefinitions'].to_list():
+            videoUrl = defin['videoUrl'].to_py()
+            quality = defin['quality'].to_py()
+            vformat = defin['format'].to_py()
             if videoUrl == '' or not isinstance(quality, str):
                 continue
-            if not vformat in self.definitions:
-                self.definitions.setdefault(vformat, {})
-            self.definitions[vformat].setdefault(quality, videoUrl)
+            if vformat not in self.__definitions:
+                self.__definitions[vformat] = {}
+            self.__definitions[vformat][quality] = videoUrl
+
+        qualityitems_name = re.search(r'qualityItems_([0-9]+)', script).group(0)
+        qualityitems = scripts.var.get(qualityitems_name).to_list()
+        for item in qualityitems:
+            if 'mp4' not in self.__definitions:
+                self.__definitions['mp4'] = {}
+            self.__definitions['mp4'][item['text'].to_py().strip('p')] = item['url'].to_py()
         self.__success = True
+        if os.path.exists('scripts.py'):
+            os.remove('scripts.py')
         print('加载成功')
 
     # 获取相关视频

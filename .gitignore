@@ -3,3 +3,4 @@ test*
 /build/
 *egg-info/
 *.bat
+*.cmd
