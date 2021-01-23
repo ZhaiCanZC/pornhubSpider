@@ -1,6 +1,9 @@
-test*
 /dist/
 /build/
 *egg-info/
+/venv/
+test*
 *.bat
 *.cmd
+release*
+
