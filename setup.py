@@ -22,6 +22,7 @@ setuptools.setup(
     install_requires=[
         "requests",
         "Js2Py",
-        "beautifulsoup4"
+        "beautifulsoup4",
+        "lxml"
         ]
 )
